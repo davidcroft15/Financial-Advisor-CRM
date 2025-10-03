@@ -140,7 +140,7 @@ export class ConsultationService {
     }
 
     // Update consultation request with appointment ID
-    const { data: updatedRequest, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('consultation_requests')
       .update({ 
         appointment_id: appointment.id,

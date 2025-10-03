@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
-import { Save, User, Building, Bell, Shield, Database } from 'lucide-react';
+import { Save, User, Bell, Shield, Database } from 'lucide-react';
 
 export const Settings: React.FC = () => {
   const [user, setUser] = useState<any>(null);

@@ -23,7 +23,7 @@ export const Reports: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [dateRange]);
+  }, [dateRange, fetchData]);
 
   const fetchData = async () => {
     try {
