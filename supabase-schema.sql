@@ -103,6 +103,25 @@ CREATE TABLE financial_goals (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create consultation_requests table
+CREATE TABLE consultation_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  preferred_date DATE NOT NULL,
+  preferred_time TIME NOT NULL,
+  message TEXT,
+  request_type TEXT DEFAULT 'initial' CHECK (request_type IN ('initial', 'follow-up', 'pension', 'business')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'declined', 'completed')),
+  advisor_id UUID REFERENCES advisors(id) ON DELETE SET NULL,
+  appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+  admin_notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_clients_advisor_id ON clients(advisor_id);
 CREATE INDEX idx_interactions_client_id ON interactions(client_id);
@@ -113,6 +132,9 @@ CREATE INDEX idx_appointments_advisor_id ON appointments(advisor_id);
 CREATE INDEX idx_appointments_client_id ON appointments(client_id);
 CREATE INDEX idx_documents_client_id ON documents(client_id);
 CREATE INDEX idx_financial_goals_client_id ON financial_goals(client_id);
+CREATE INDEX idx_consultation_requests_advisor_id ON consultation_requests(advisor_id);
+CREATE INDEX idx_consultation_requests_status ON consultation_requests(status);
+CREATE INDEX idx_consultation_requests_created_at ON consultation_requests(created_at);
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE advisors ENABLE ROW LEVEL SECURITY;
@@ -122,6 +144,7 @@ ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_goals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE consultation_requests ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
 -- Admins can see all advisors, users can see their own
@@ -191,6 +214,39 @@ CREATE POLICY "Advisors can view own financial goals" ON financial_goals
     )
   );
 
+-- Consultation requests policies
+-- Anyone can insert consultation requests (public form)
+CREATE POLICY "Anyone can create consultation requests" ON consultation_requests
+  FOR INSERT WITH CHECK (true);
+
+-- Only admins can view all consultation requests
+CREATE POLICY "Admins can view all consultation requests" ON consultation_requests
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM advisors 
+      WHERE user_id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- Advisors can view consultation requests assigned to them
+CREATE POLICY "Advisors can view assigned consultation requests" ON consultation_requests
+  FOR SELECT USING (
+    advisor_id IS NOT NULL AND
+    EXISTS (
+      SELECT 1 FROM advisors 
+      WHERE id = consultation_requests.advisor_id AND user_id = auth.uid()
+    )
+  );
+
+-- Only admins can update consultation requests
+CREATE POLICY "Admins can update consultation requests" ON consultation_requests
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM advisors 
+      WHERE user_id = auth.uid() AND role = 'admin'
+    )
+  );
+
 -- Create function to handle updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -208,6 +264,9 @@ CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_financial_goals_updated_at BEFORE UPDATE ON financial_goals
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_consultation_requests_updated_at BEFORE UPDATE ON consultation_requests
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Create storage bucket for documents

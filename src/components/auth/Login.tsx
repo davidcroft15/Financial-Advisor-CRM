@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (user?: any) => void;
   onShowAdminLogin?: () => void;
 }
 
@@ -50,7 +50,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin }) => {
         return;
       }
 
-      onLogin();
+      onLogin(data.user);
     } catch (error: any) {
       console.error('Login failed:', error);
       setError(error.message || 'Login failed. Please check your credentials.');

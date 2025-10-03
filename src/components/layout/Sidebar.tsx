@@ -6,7 +6,9 @@ import {
   CheckSquare, 
   Settings,
   BarChart3,
-  LogOut
+  LogOut,
+  Shield,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
@@ -15,9 +17,10 @@ interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onLogout: () => void;
+  userRole?: 'admin' | 'advisor' | null;
 }
 
-const navigationItems = [
+const baseNavigationItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'clients', label: 'Clients', icon: Users },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -26,7 +29,15 @@ const navigationItems = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onLogout }) => {
+const adminNavigationItems = [
+  { id: 'admin', label: 'Admin Panel', icon: Shield },
+  { id: 'consultations', label: 'Consultations', icon: MessageSquare },
+];
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onLogout, userRole }) => {
+  const navigationItems = userRole === 'admin' 
+    ? [...baseNavigationItems, ...adminNavigationItems]
+    : baseNavigationItems;
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
       <div className="p-6">

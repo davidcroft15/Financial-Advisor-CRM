@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Shield, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface AdminLoginProps {
-  onAdminLogin: () => void;
+  onAdminLogin: (user?: any) => void;
   onBackToUserLogin: () => void;
 }
 
@@ -25,6 +25,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onAdminLogin, onBackToUs
     try {
       console.log('Attempting admin login with:', email);
 
+      // Test admin credentials (for development/testing)
+      if (email === 'admin@test.com' && password === 'admin123') {
+        console.log('Using test admin credentials');
+        onAdminLogin(); // No user passed for test credentials
+        return;
+      }
+
       // First, authenticate with Supabase
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -37,21 +44,36 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onAdminLogin, onBackToUs
       }
 
       // Check if user is admin by looking up in advisors table
-      const { data: advisorData, error: advisorError } = await supabase
+      // First try by user_id, then by email as fallback
+      let { data: advisorData, error: advisorError } = await supabase
         .from('advisors')
         .select('*')
         .eq('user_id', authData.user.id)
         .eq('role', 'admin')
         .single();
 
+      // If not found by user_id, try by email
       if (advisorError || !advisorData) {
-        // Sign out the user since they're not admin
-        await supabase.auth.signOut();
-        throw new Error('Access denied. Admin privileges required.');
+        console.log('Not found by user_id, trying by email...');
+        const { data: advisorByEmail, error: emailError } = await supabase
+          .from('advisors')
+          .select('*')
+          .eq('email', authData.user.email)
+          .eq('role', 'admin')
+          .single();
+        
+        if (emailError || !advisorByEmail) {
+          // Sign out the user since they're not admin
+          await supabase.auth.signOut();
+          throw new Error('Access denied. Admin privileges required.');
+        }
+        
+        advisorData = advisorByEmail;
+        advisorError = null;
       }
 
       console.log('Admin login successful:', advisorData);
-      onAdminLogin();
+      onAdminLogin(authData.user); // Pass the real Supabase user
     } catch (error: any) {
       console.error('Admin login failed:', error);
       setError(error.message || 'Admin login failed. Please check your credentials.');

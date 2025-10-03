@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { ConsultationRequestModal, ConsultationRequest } from '../consultation/ConsultationRequestModal';
+import { ConsultationService } from '../../lib/consultationService';
 import { 
   Shield, 
   Users, 
@@ -23,6 +25,9 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdminLogin }) => {
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const services = [
     {
       icon: Target,
@@ -45,6 +50,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
       description: 'Comprehensive financial strategies for business owners to grow and protect their wealth.'
     }
   ];
+
+  const handleConsultationRequest = async (request: ConsultationRequest) => {
+    try {
+      setIsSubmitting(true);
+      console.log('Submitting consultation request:', request);
+      const result = await ConsultationService.submitRequest(request);
+      console.log('Consultation request submitted successfully:', result);
+      // Show success message (you could add a toast notification here)
+      alert('Thank you! Your consultation request has been submitted. We will contact you within 24 hours to confirm your appointment.');
+    } catch (error) {
+      console.error('Error submitting consultation request:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Sorry, there was an error submitting your request: ${errorMessage}. Please try again or contact us directly.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -92,7 +114,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
               Get personalized advice that puts your interests first.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-3 bg-indigo-600 hover:bg-indigo-700">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-3 bg-indigo-600 hover:bg-indigo-700"
+                onClick={() => setIsConsultationModalOpen(true)}
+              >
                 Schedule Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -186,7 +212,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
                 Schedule a complimentary consultation to discuss your financial goals and how we can help you achieve them.
               </p>
               <div className="space-y-4">
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700" size="lg">
+                <Button 
+                  className="w-full bg-indigo-600 hover:bg-indigo-700" 
+                  size="lg"
+                  onClick={() => setIsConsultationModalOpen(true)}
+                >
                   Schedule Free Consultation
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -228,6 +258,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
           </div>
         </div>
       </footer>
+
+      {/* Consultation Request Modal */}
+      <ConsultationRequestModal
+        isOpen={isConsultationModalOpen}
+        onClose={() => setIsConsultationModalOpen(false)}
+        onSubmit={handleConsultationRequest}
+      />
+
     </div>
   );
 };

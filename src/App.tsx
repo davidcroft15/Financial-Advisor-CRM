@@ -4,6 +4,7 @@ import { LandingPage } from './components/landing/LandingPage';
 import { Login } from './components/auth/Login';
 import { AdminLogin } from './components/auth/AdminLogin';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { ConsultationRequests } from './components/admin/ConsultationRequests';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './components/dashboard/Dashboard';
@@ -18,7 +19,7 @@ function App() {
   const [userRole, setUserRole] = useState<'admin' | 'advisor' | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Start with false to show landing page immediately
+  const [isLoading, setIsLoading] = useState(true); // Start with true for initial load
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
@@ -112,15 +113,39 @@ function App() {
     // Implement search functionality
   };
 
-  const handleAdminLogin = () => {
-    setUserRole('admin');
+  const handleAdminLogin = (user?: any) => {
+    if (user) {
+      // Real Supabase user
+      setUser(user);
+      setUserRole('admin');
+    } else {
+      // Test admin fallback
+      const mockUser = {
+        id: 'test-admin-user',
+        email: 'admin@test.com'
+      };
+      setUser(mockUser);
+      setUserRole('admin');
+    }
     setShowLanding(false);
     setShowAdminLogin(false);
     setShowUserLogin(false);
   };
 
-  const handleUserLogin = () => {
-    setUserRole('advisor');
+  const handleUserLogin = (user?: any) => {
+    if (user) {
+      // Real Supabase user
+      setUser(user);
+      setUserRole('advisor');
+    } else {
+      // Test user fallback
+      const mockUser = {
+        id: 'test-user',
+        email: 'user@test.com'
+      };
+      setUser(mockUser);
+      setUserRole('advisor');
+    }
     setShowLanding(false);
     setShowAdminLogin(false);
     setShowUserLogin(false);
@@ -158,17 +183,7 @@ function App() {
     );
   }
 
-  // Show landing page if no user and not in login flow
-  if (!user && showLanding) {
-    return (
-      <LandingPage 
-        onShowLogin={handleShowUserLogin}
-        onShowAdminLogin={handleShowAdminLogin}
-      />
-    );
-  }
-
-  // Show login pages
+  // Show landing page by default if no user is logged in
   if (!user) {
     if (showAdminLogin) {
       return (
@@ -186,16 +201,58 @@ function App() {
         />
       );
     }
+    // Default to landing page
+    return (
+      <LandingPage 
+        onShowLogin={handleShowUserLogin}
+        onShowAdminLogin={handleShowAdminLogin}
+      />
+    );
   }
 
   // Show admin dashboard if user is admin
   if (user && userRole === 'admin') {
-    return <AdminDashboard />;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex h-screen">
+          <Sidebar 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab}
+            onLogout={handleLogout}
+            userRole={userRole}
+          />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <Header 
+              onSearch={handleSearch}
+              searchQuery={searchQuery}
+            />
+            <main className="flex-1 overflow-y-auto p-6">
+              {activeTab === 'dashboard' && <Dashboard />}
+              {activeTab === 'clients' && <Clients />}
+              {activeTab === 'calendar' && <Calendar />}
+              {activeTab === 'tasks' && <Tasks />}
+              {activeTab === 'reports' && <Reports />}
+              {activeTab === 'settings' && <Settings />}
+              {activeTab === 'admin' && <AdminDashboard />}
+              {activeTab === 'consultations' && <ConsultationRequests />}
+            </main>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Show regular dashboard if user is advisor
-  if (user && userRole === 'advisor') {
+  // Show regular dashboard if user is advisor or has any role
+  if (user && (userRole === 'advisor' || userRole)) {
     // Continue to main app
+  } else if (user) {
+    // If user exists but no role, show landing page
+    return (
+      <LandingPage 
+        onShowLogin={handleShowUserLogin}
+        onShowAdminLogin={handleShowAdminLogin}
+      />
+    );
   }
 
   return (
@@ -205,6 +262,7 @@ function App() {
           activeTab={activeTab} 
           onTabChange={setActiveTab}
           onLogout={handleLogout}
+          userRole={userRole}
         />
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header 
