@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Client, Task, Appointment } from '../../types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -21,11 +21,7 @@ export const Reports: React.FC = () => {
   const [showClientFilter, setShowClientFilter] = useState(false);
   const [reportType, setReportType] = useState<'all' | 'individual' | 'group'>('all');
 
-  useEffect(() => {
-    fetchData();
-  }, [dateRange, fetchData]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -68,7 +64,11 @@ export const Reports: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Filter data based on selected clients
   const getFilteredData = () => {
