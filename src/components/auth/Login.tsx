@@ -159,17 +159,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin, onBackT
           </Button>
 
 
-                  {onBackToLanding && (
-                    <Button
-                      variant="ghost"
-                      className="w-full"
-                      onClick={onBackToLanding}
-                      disabled={isLoading}
-                    >
-                      ← Back to Home
-                    </Button>
-                  )}
-
                   {onShowAdminLogin && (
                     <Button
                       variant="outline"
@@ -178,6 +167,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin, onBackT
                       disabled={isLoading}
                     >
                       🛡️ Admin Access
+                    </Button>
+                  )}
+
+                  {onBackToLanding && (
+                    <Button
+                      variant="ghost"
+                      className="w-full"
+                      onClick={onBackToLanding}
+                      disabled={isLoading}
+                    >
+                      ← Back to Home
                     </Button>
                   )}
         </CardContent>
