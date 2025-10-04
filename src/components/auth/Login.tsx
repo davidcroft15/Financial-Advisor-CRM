@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { testSupabaseConnection, testAuth } from '../../lib/test-supabase';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -8,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 interface LoginProps {
   onLogin: (user?: any) => void;
   onShowAdminLogin?: () => void;
+  onBackToLanding?: () => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin, onBackToLanding }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -79,17 +79,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin }) => {
     }
   };
 
-  const testConnection = async () => {
-    console.log('Testing Supabase connection...');
-    const connectionOk = await testSupabaseConnection();
-    const authOk = await testAuth();
-    
-    if (connectionOk && authOk) {
-      setError('✅ Supabase connection is working!');
-    } else {
-      setError('❌ Supabase connection failed. Check console for details.');
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -169,14 +158,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onShowAdminLogin }) => {
             Continue with Google
           </Button>
 
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={testConnection}
-                    disabled={isLoading}
-                  >
-                    🔧 Test Supabase Connection
-                  </Button>
+
+                  {onBackToLanding && (
+                    <Button
+                      variant="ghost"
+                      className="w-full"
+                      onClick={onBackToLanding}
+                      disabled={isLoading}
+                    >
+                      ← Back to Home
+                    </Button>
+                  )}
 
                   {onShowAdminLogin && (
                     <Button

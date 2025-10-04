@@ -198,6 +198,7 @@ function App() {
         <Login 
           onLogin={handleUserLogin}
           onShowAdminLogin={handleShowAdminLogin}
+          onBackToLanding={handleBackToLanding}
         />
       );
     }

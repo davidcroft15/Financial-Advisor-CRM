@@ -26,6 +26,8 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdminLogin }) => {
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [isLearnMoreModalOpen, setIsLearnMoreModalOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const services = [
@@ -122,7 +124,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
                 Schedule Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-3">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-8 py-3"
+                onClick={() => setIsLearnMoreModalOpen(true)}
+              >
                 Learn More
               </Button>
             </div>
@@ -220,7 +227,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
                   Schedule Free Consultation
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button variant="outline" className="w-full" size="lg">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => setIsDownloadModalOpen(true)}
+                >
                   Download Our Guide
                 </Button>
               </div>
@@ -266,6 +278,102 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowAdm
         onSubmit={handleConsultationRequest}
       />
 
+      {/* Learn More Modal */}
+      <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${isLearnMoreModalOpen ? 'block' : 'hidden'}`}>
+        <div className="bg-white rounded-lg p-8 max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Learn More About Our Services</h2>
+            <button
+              onClick={() => setIsLearnMoreModalOpen(false)}
+              className="text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              We specialize in providing comprehensive financial planning services tailored specifically for pension employees and business owners.
+            </p>
+            <h3 className="text-lg font-semibold text-gray-900">Our Approach:</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Fee-only, fiduciary advice with no hidden costs</li>
+              <li>Personalized strategies based on your unique situation</li>
+              <li>Focus on long-term wealth building and retirement planning</li>
+              <li>Regular reviews and adjustments as your needs change</li>
+            </ul>
+            <h3 className="text-lg font-semibold text-gray-900">Services Include:</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Retirement planning and pension optimization</li>
+              <li>Investment portfolio management</li>
+              <li>Tax planning and optimization</li>
+              <li>Estate planning and wealth transfer</li>
+              <li>Business succession planning</li>
+            </ul>
+            <div className="pt-4">
+              <Button 
+                onClick={() => {
+                  setIsLearnMoreModalOpen(false);
+                  setIsConsultationModalOpen(true);
+                }}
+                className="w-full"
+              >
+                Schedule Your Free Consultation
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Download Guide Modal */}
+      <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${isDownloadModalOpen ? 'block' : 'hidden'}`}>
+        <div className="bg-white rounded-lg p-8 max-w-md mx-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Download Our Guide</h2>
+            <button
+              onClick={() => setIsDownloadModalOpen(false)}
+              className="text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+          <div className="space-y-4 text-gray-700">
+            <p>
+              Get our comprehensive guide to financial planning for pension employees and business owners.
+            </p>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">What's Included:</h3>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Pension optimization strategies</li>
+                <li>Tax planning tips</li>
+                <li>Investment guidelines</li>
+                <li>Retirement planning checklist</li>
+              </ul>
+            </div>
+            <div className="pt-4 space-y-3">
+              <Button 
+                onClick={() => {
+                  // Placeholder for actual download functionality
+                  alert('Guide download will be available soon! For now, please schedule a consultation to receive personalized guidance.');
+                  setIsDownloadModalOpen(false);
+                }}
+                className="w-full"
+              >
+                Download Guide (Coming Soon)
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setIsDownloadModalOpen(false);
+                  setIsConsultationModalOpen(true);
+                }}
+                className="w-full"
+              >
+                Schedule Consultation Instead
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
