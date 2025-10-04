@@ -228,7 +228,7 @@ function App() {
               searchQuery={searchQuery}
             />
             <main className="flex-1 overflow-y-auto p-6">
-              {activeTab === 'dashboard' && <Dashboard />}
+              {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
               {activeTab === 'clients' && <Clients />}
               {activeTab === 'calendar' && <Calendar />}
               {activeTab === 'tasks' && <Tasks />}
@@ -271,7 +271,7 @@ function App() {
             searchQuery={searchQuery}
           />
           <main className="flex-1 overflow-y-auto p-6">
-            {activeTab === 'dashboard' && <Dashboard />}
+            {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
             {activeTab === 'clients' && <Clients />}
             {activeTab === 'calendar' && <Calendar />}
             {activeTab === 'tasks' && <Tasks />}

@@ -5,10 +5,10 @@ import { Users, Calendar, CheckSquare, DollarSign, TrendingUp, Clock, AlertCircl
 import { Client, Appointment, Task } from '../../types';
 
 interface DashboardProps {
-  // Add props as needed
+  onNavigate?: (tab: string) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = () => {
+export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,6 +18,12 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  const handleQuickAction = (action: string) => {
+    if (onNavigate) {
+      onNavigate(action);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -309,25 +315,37 @@ export const Dashboard: React.FC<DashboardProps> = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <button className="w-full text-left p-3 rounded-md border hover:bg-accent">
+            <button 
+              className="w-full text-left p-3 rounded-md border hover:bg-accent transition-colors"
+              onClick={() => handleQuickAction('clients')}
+            >
               <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4" />
                 <span>Add New Client</span>
               </div>
             </button>
-            <button className="w-full text-left p-3 rounded-md border hover:bg-accent">
+            <button 
+              className="w-full text-left p-3 rounded-md border hover:bg-accent transition-colors"
+              onClick={() => handleQuickAction('calendar')}
+            >
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4" />
                 <span>Schedule Meeting</span>
               </div>
             </button>
-            <button className="w-full text-left p-3 rounded-md border hover:bg-accent">
+            <button 
+              className="w-full text-left p-3 rounded-md border hover:bg-accent transition-colors"
+              onClick={() => handleQuickAction('tasks')}
+            >
               <div className="flex items-center space-x-2">
                 <CheckSquare className="h-4 w-4" />
                 <span>Create Task</span>
               </div>
             </button>
-            <button className="w-full text-left p-3 rounded-md border hover:bg-accent">
+            <button 
+              className="w-full text-left p-3 rounded-md border hover:bg-accent transition-colors"
+              onClick={() => handleQuickAction('reports')}
+            >
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4" />
                 <span>Generate Report</span>
