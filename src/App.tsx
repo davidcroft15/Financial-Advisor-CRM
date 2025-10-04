@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
+import { SearchService, SearchResult } from './lib/searchService';
 import { LandingPage } from './components/landing/LandingPage';
 import { Login } from './components/auth/Login';
 import { AdminLogin } from './components/auth/AdminLogin';
@@ -19,6 +20,8 @@ function App() {
   const [userRole, setUserRole] = useState<'admin' | 'advisor' | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Start with true for initial load
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
@@ -108,9 +111,46 @@ function App() {
     setUserRole(null);
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    // Implement search functionality
+    
+    if (query.trim() && user) {
+      try {
+        const results = await SearchService.searchAll(query, user.id);
+        setSearchResults(results);
+        setShowSearchResults(true);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleSearchResultClick = (result: SearchResult) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    
+    // Navigate to the appropriate tab based on result type
+    switch (result.type) {
+      case 'client':
+        setActiveTab('clients');
+        break;
+      case 'appointment':
+        setActiveTab('calendar');
+        break;
+      case 'task':
+        setActiveTab('tasks');
+        break;
+      case 'consultation':
+        setActiveTab('consultations');
+        break;
+      default:
+        setActiveTab('dashboard');
+    }
   };
 
   const handleAdminLogin = (user?: any) => {
@@ -226,6 +266,11 @@ function App() {
             <Header 
               onSearch={handleSearch}
               searchQuery={searchQuery}
+              onLogout={handleLogout}
+              user={user}
+              searchResults={searchResults}
+              showSearchResults={showSearchResults}
+              onSearchResultClick={handleSearchResultClick}
             />
             <main className="flex-1 overflow-y-auto p-6">
               {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
@@ -269,6 +314,11 @@ function App() {
           <Header 
             onSearch={handleSearch}
             searchQuery={searchQuery}
+            onLogout={handleLogout}
+            user={user}
+            searchResults={searchResults}
+            showSearchResults={showSearchResults}
+            onSearchResultClick={handleSearchResultClick}
           />
           <main className="flex-1 overflow-y-auto p-6">
             {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
