@@ -271,6 +271,7 @@ function App() {
               searchResults={searchResults}
               showSearchResults={showSearchResults}
               onSearchResultClick={handleSearchResultClick}
+              onNavigate={setActiveTab}
             />
             <main className="flex-1 overflow-y-auto p-6">
               {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
@@ -319,6 +320,7 @@ function App() {
             searchResults={searchResults}
             showSearchResults={showSearchResults}
             onSearchResultClick={handleSearchResultClick}
+            onNavigate={setActiveTab}
           />
           <main className="flex-1 overflow-y-auto p-6">
             {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
