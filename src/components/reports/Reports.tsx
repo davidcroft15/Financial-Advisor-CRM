@@ -94,12 +94,16 @@ export const Reports: React.FC = () => {
   const { clients: filteredClients, tasks: filteredTasks, appointments: filteredAppointments } = getFilteredData();
 
   const calculateTotalAUM = () => {
-    return filteredClients.reduce((total, client) => total + (client.financial_details.assets || 0), 0);
+    return filteredClients.reduce((total, client) => total + (client.financial_details.assets_under_management || 0), 0);
+  };
+
+  const calculateTotalAssets = () => {
+    return filteredClients.reduce((total, client) => total + (client.financial_details.total_assets || 0), 0);
   };
 
   const calculateNetWorth = () => {
     return filteredClients.reduce((total, client) => {
-      const assets = client.financial_details.assets || 0;
+      const assets = client.financial_details.total_assets || 0;
       const liabilities = client.financial_details.liabilities || 0;
       return total + (assets - liabilities);
     }, 0);
@@ -145,12 +149,12 @@ export const Reports: React.FC = () => {
 
   const getTopClientsByAUM = () => {
     return filteredClients
-      .filter(client => client.financial_details.assets > 0)
-      .sort((a, b) => b.financial_details.assets - a.financial_details.assets)
+      .filter(client => client.financial_details.assets_under_management > 0)
+      .sort((a, b) => b.financial_details.assets_under_management - a.financial_details.assets_under_management)
       .slice(0, 5)
       .map(client => ({
         name: `${client.personal_details.first_name} ${client.personal_details.last_name}`,
-        aum: client.financial_details.assets
+        aum: client.financial_details.assets_under_management
       }));
   };
 
@@ -163,9 +167,10 @@ export const Reports: React.FC = () => {
       'Email': client.personal_details.email,
       'Phone': client.personal_details.phone,
       'Status': client.status,
-      'Assets': client.financial_details.assets,
+      'Total Assets': client.financial_details.total_assets,
+      'Assets Under Management': client.financial_details.assets_under_management,
       'Liabilities': client.financial_details.liabilities,
-      'Net Worth': client.financial_details.assets - client.financial_details.liabilities,
+      'Net Worth': client.financial_details.total_assets - client.financial_details.liabilities,
       'Created': new Date(client.created_at).toLocaleDateString()
     }));
 
@@ -234,7 +239,11 @@ export const Reports: React.FC = () => {
             </div>
             <div class="metric">
               <div class="metric-value">$${calculateTotalAUM().toLocaleString()}</div>
-              <div class="metric-label">Total AUM</div>
+              <div class="metric-label">Assets Under Management</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">$${calculateTotalAssets().toLocaleString()}</div>
+              <div class="metric-label">Total Client Assets</div>
             </div>
             <div class="metric">
               <div class="metric-value">$${calculateNetWorth().toLocaleString()}</div>
@@ -255,7 +264,8 @@ export const Reports: React.FC = () => {
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Status</th>
-                  <th>Assets</th>
+                  <th>Total Assets</th>
+                  <th>AUM</th>
                   <th>Liabilities</th>
                   <th>Net Worth</th>
                 </tr>
@@ -267,9 +277,10 @@ export const Reports: React.FC = () => {
                     <td>${client.personal_details.email}</td>
                     <td>${client.personal_details.phone}</td>
                     <td>${client.status}</td>
-                    <td>$${client.financial_details.assets.toLocaleString()}</td>
+                    <td>$${client.financial_details.total_assets.toLocaleString()}</td>
+                    <td>$${client.financial_details.assets_under_management.toLocaleString()}</td>
                     <td>$${client.financial_details.liabilities.toLocaleString()}</td>
-                    <td>$${(client.financial_details.assets - client.financial_details.liabilities).toLocaleString()}</td>
+                    <td>$${(client.financial_details.total_assets - client.financial_details.liabilities).toLocaleString()}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -462,7 +473,7 @@ export const Reports: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="font-medium">
-                        ${client.financial_details.assets.toLocaleString()}
+                        ${client.financial_details.assets_under_management.toLocaleString()}
                       </div>
                       <div className="text-sm text-muted-foreground">AUM</div>
                     </div>
@@ -491,13 +502,26 @@ export const Reports: React.FC = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total AUM</CardTitle>
+            <CardTitle className="text-sm font-medium">Assets Under Management</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${calculateTotalAUM().toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              Assets under management
+              Assets you manage
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Client Assets</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${calculateTotalAssets().toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              All client assets
             </p>
           </CardContent>
         </Card>

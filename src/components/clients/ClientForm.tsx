@@ -32,7 +32,8 @@ export const ClientForm: React.FC<ClientFormProps> = ({ client, onSave, onCancel
     financial_details: {
       income: 0,
       expenses: 0,
-      assets: 0,
+      total_assets: 0,
+      assets_under_management: 0,
       liabilities: 0,
       insurance_policies: [] as any[],
       investments: [] as any[]
@@ -51,7 +52,8 @@ export const ClientForm: React.FC<ClientFormProps> = ({ client, onSave, onCancel
         financial_details: client.financial_details || {
           income: 0,
           expenses: 0,
-          assets: 0,
+          total_assets: 0,
+          assets_under_management: 0,
           liabilities: 0,
           insurance_policies: [],
           investments: []
@@ -286,8 +288,18 @@ export const ClientForm: React.FC<ClientFormProps> = ({ client, onSave, onCancel
                   <label className="text-sm font-medium">Total Assets</label>
                   <Input
                     type="number"
-                    value={formData.financial_details.assets}
-                    onChange={(e) => handleNestedInputChange('financial_details', 'assets', parseFloat(e.target.value) || 0)}
+                    value={formData.financial_details.total_assets}
+                    onChange={(e) => handleNestedInputChange('financial_details', 'total_assets', parseFloat(e.target.value) || 0)}
+                    placeholder="Client's total net worth"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Assets Under Management</label>
+                  <Input
+                    type="number"
+                    value={formData.financial_details.assets_under_management}
+                    onChange={(e) => handleNestedInputChange('financial_details', 'assets_under_management', parseFloat(e.target.value) || 0)}
+                    placeholder="Assets you manage for this client"
                   />
                 </div>
                 <div>

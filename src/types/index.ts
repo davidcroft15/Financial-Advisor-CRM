@@ -21,7 +21,8 @@ export interface Client {
   financial_details: {
     income: number;
     expenses: number;
-    assets: number;
+    total_assets: number;
+    assets_under_management: number;
     liabilities: number;
     insurance_policies: InsurancePolicy[];
     investments: Investment[];
