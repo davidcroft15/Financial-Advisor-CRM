@@ -101,7 +101,11 @@ export const Clients: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Assets:</span>
-                <span>${selectedClient?.financial_details.assets?.toLocaleString() || '0'}</span>
+                <span>${selectedClient?.financial_details.total_assets?.toLocaleString() || '0'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Assets Under Management:</span>
+                <span>${selectedClient?.financial_details.assets_under_management?.toLocaleString() || '0'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Liabilities:</span>
@@ -110,7 +114,7 @@ export const Clients: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Net Worth:</span>
                 <span className="font-semibold">
-                  ${((selectedClient?.financial_details.assets || 0) - (selectedClient?.financial_details.liabilities || 0)).toLocaleString()}
+                  ${((selectedClient?.financial_details.total_assets || 0) - (selectedClient?.financial_details.liabilities || 0)).toLocaleString()}
                 </span>
               </div>
             </div>

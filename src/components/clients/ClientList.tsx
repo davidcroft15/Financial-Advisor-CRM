@@ -177,7 +177,7 @@ export const ClientList: React.FC<ClientListProps> = ({ onEditClient, onViewClie
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">AUM:</span>
-                  <span>${client.financial_details.assets?.toLocaleString() || '0'}</span>
+                  <span>${client.financial_details.assets_under_management?.toLocaleString() || '0'}</span>
                 </div>
                 {client.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">

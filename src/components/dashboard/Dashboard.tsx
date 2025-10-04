@@ -137,12 +137,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   };
 
   const calculateTotalAUM = () => {
-    return clients.reduce((total, client) => total + (client.financial_details.assets || 0), 0);
+    return clients.reduce((total, client) => total + (client.financial_details.assets_under_management || 0), 0);
   };
 
   const calculateNetWorth = () => {
     return clients.reduce((total, client) => {
-      const assets = client.financial_details.assets || 0;
+      const assets = client.financial_details.total_assets || 0;
       const liabilities = client.financial_details.liabilities || 0;
       return total + (assets - liabilities);
     }, 0);
