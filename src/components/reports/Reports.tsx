@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Download, TrendingUp, Users, Calendar, CheckSquare, DollarSign, Filter, X, Printer, FileText, Search } from 'lucide-react';
+import { Download, TrendingUp, Users, Calendar, CheckSquare, DollarSign, Filter, X, Printer, FileText, Search, RefreshCw } from 'lucide-react';
 
 export const Reports: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -26,7 +26,10 @@ export const Reports: React.FC = () => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       // Fetch clients
       const { data: clientsData, error: clientsError } = await supabase
@@ -61,6 +64,10 @@ export const Reports: React.FC = () => {
       setAppointments(appointmentsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Reset data on error to prevent stale state
+      setClients([]);
+      setTasks([]);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -72,8 +79,14 @@ export const Reports: React.FC = () => {
 
   // Filter data based on selected clients
   const getFilteredData = () => {
-    if (reportType === 'all' || selectedClients.length === 0) {
+    // If report type is 'all', show all data
+    if (reportType === 'all') {
       return { clients, tasks, appointments };
+    }
+
+    // For 'individual' or 'group' reports, only show selected clients
+    if (selectedClients.length === 0) {
+      return { clients: [], tasks: [], appointments: [] };
     }
 
     const filteredClients = clients.filter(client => selectedClients.includes(client.id));
@@ -336,6 +349,10 @@ export const Reports: React.FC = () => {
     setReportType('all');
   };
 
+  const handleRefresh = () => {
+    fetchData();
+  };
+
   const getFilteredClients = () => {
     return clients.filter(client => 
       client.personal_details.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -385,6 +402,14 @@ export const Reports: React.FC = () => {
           >
             <Filter className="mr-2 h-4 w-4" />
             Filter Clients
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
           </Button>
           <Button onClick={exportToCSV}>
             <Download className="mr-2 h-4 w-4" />
@@ -480,6 +505,31 @@ export const Reports: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Clients Selected Message */}
+      {reportType !== 'all' && selectedClients.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <div className="text-muted-foreground">
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-medium mb-2">No Clients Selected</h3>
+              <p className="mb-4">
+                {reportType === 'individual' 
+                  ? 'Please select a client to generate an individual report.'
+                  : 'Please select one or more clients to generate a group report.'
+                }
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowClientFilter(true)}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Select Clients
+              </Button>
             </div>
           </CardContent>
         </Card>

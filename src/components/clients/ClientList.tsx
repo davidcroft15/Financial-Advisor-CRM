@@ -40,6 +40,7 @@ export const ClientList: React.FC<ClientListProps> = ({ onEditClient, onViewClie
       
       if (!user) {
         console.error('No user found');
+        setLoading(false);
         return;
       }
 

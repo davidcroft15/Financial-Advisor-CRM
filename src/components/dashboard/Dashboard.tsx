@@ -30,7 +30,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       // Fetch clients
       const { data: clientsData, error: clientsError } = await supabase
